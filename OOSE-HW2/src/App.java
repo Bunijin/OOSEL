@@ -12,9 +12,10 @@ public class App {
     public static void main(String[] args) throws Exception {
         setupManager();
         ATM: while (true) {
-            System.out.println("ATM ComputerThanyaburi Bank");
+            System.out.println("\nATM ComputerThanyaburi Bank");
             System.out.println("1. Login");
             System.out.println("2. Exit");
+            System.out.print("Choose : ");
             int choice;
             while (true) {
                 try {
@@ -23,6 +24,7 @@ public class App {
                     break;
                 } catch (InputMismatchException e) {
                     System.out.print("\namount of account must be number.");
+                    scanner.nextLine();
                 }
             }
             switch (choice) {
@@ -60,8 +62,8 @@ public class App {
 
     private static void login() {
         while (true) {
-            System.out.println("ATM ComputerThanyaburi Bank");
-            System.out.print("Account ID : ");
+            System.out.println("\nATM ComputerThanyaburi Bank");
+            System.out.print("Account ID\t : ");
             String number = scanner.nextLine();
             System.out.print("Account Password : ");
             String password = scanner.nextLine();
@@ -82,11 +84,13 @@ public class App {
     }
 
     private static void managerMenu() {
-        System.out.println("=".repeat(20));
+        System.out.println("=".repeat(30));
         MNG: while (true) {
             System.out.println("Manager Menu");
             System.out.println("1. Add Accounts");
-            System.out.println("2. Logout");
+            System.out.println("2. View Accounts");
+            System.out.println("3. Logout");
+            System.out.print("Choose : ");
             try {
                 int choice = scanner.nextInt();
                 scanner.nextLine();
@@ -95,7 +99,12 @@ public class App {
                         addAccount();
                         break;
                     case 2:
-                        System.out.println("=".repeat(20));
+                        for (Account acc : ACCOUNT) {
+                            System.out.println("ID : " + acc.getId() + "\t Name : " + acc.getName() + "\t Gender : " + acc.getGender() + "\t Balance : " + acc.getBalance());
+                        }
+                        break;
+                    case 3:
+                        System.out.println("=".repeat(30));
                         break MNG;
                     default:
                         System.out.println("Invalid choice.");
@@ -157,7 +166,7 @@ public class App {
 
     private static void accountInfo(Account account) {
         ACC: while (true) {
-            System.out.println("=".repeat(20));
+            System.out.println("=".repeat(30));
             System.out.println("Menu Service");
             System.out.println("1. Balance");
             System.out.println("2. Withdraw");
