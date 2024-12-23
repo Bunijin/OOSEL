@@ -43,7 +43,7 @@ public class Account extends Person implements ATMaction {
 
     @Override
     public void withdraw() {
-        System.out.println("Amount to withdraw : ");
+        System.out.print("Amount to withdraw : ");
         int amount;
         while (true) {
             try {
@@ -63,7 +63,7 @@ public class Account extends Person implements ATMaction {
 
     @Override
     public void deposit() {
-        System.out.println("Amount to deposit : ");
+        System.out.print("Amount to deposit : ");
         int amount;
         while (true) {
             try {
@@ -80,7 +80,7 @@ public class Account extends Person implements ATMaction {
     @Override
     public void transfer(Account acc) {
         while (true) {
-            System.out.println("Amount to transfer : ");
+            System.out.print("Amount to transfer : ");
             int amount;
             while (true) {
                 try {
