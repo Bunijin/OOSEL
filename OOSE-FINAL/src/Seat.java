@@ -18,13 +18,13 @@ public class Seat {
     public void bookSeat() {
         if (!isBooked) {
             isBooked = true;
-            System.out.println("Seat " + seatNumber + " successfully booked.");
+            System.out.println("Seat " + seatNumber + " booked.");
         } else {
-            System.out.println("Seat " + seatNumber + " is already booked.");
+            System.out.println("Seat already booked.");
         }
     }
 
-    public void cancelBooking() {
+    public void unbookSeat() {
         if (isBooked) {
             isBooked = false;
             System.out.println("Seat " + seatNumber + " booking canceled.");

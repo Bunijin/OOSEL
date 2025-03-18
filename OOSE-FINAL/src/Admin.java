@@ -45,5 +45,6 @@ public class Admin extends Account {
     public void addShowtime(Movie movie, Showtime showtime) {
         movie.getShowtimes().add(showtime);
         System.out.println("Showtime added for " + movie.getTitle());
+        showtime.displaySeats();
     }
 }

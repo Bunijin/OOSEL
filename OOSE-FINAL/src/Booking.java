@@ -1,53 +1,22 @@
 import java.util.List;
 
 public class Booking {
-    private static int bookingCounter = 1;
-    private int bookingId;
-    private Member member;
-    private Showtime showtime;
-    private List<Seat> seats;
-    private double totalPrice;
-    private boolean isConfirmed;
+    private Movie movie; // Movie being booked
+    private Showtime showtime; // Showtime of the movie
+    private List<Seat> seats; // List of selected seats
+    private boolean isConfirmed; // Booking confirmation status
 
-    public Booking(Member member, Showtime showtime, List<Seat> seats) {
-        this.bookingId = bookingCounter++;
-        this.member = member;
+    // Constructor to initialize a booking
+    public Booking(Movie movie, Showtime showtime, List<Seat> seats) {
+        this.movie = movie;
         this.showtime = showtime;
         this.seats = seats;
-        this.totalPrice = seats.size() * showtime.getPrice();
-        this.isConfirmed = false;
+        this.isConfirmed = false; // Initially, the booking is not confirmed
     }
 
-    public int getBookingId() {
-        return bookingId;
-    }
-
-    public double getTotalPrice() {
-        return totalPrice;
-    }
-
-    public void confirm() {
-        isConfirmed = true;
-        for (Seat seat : seats) {
-            seat.setBooked(true); // Mark the selected seats as booked
-        }
-        System.out.println("✅ Booking #" + bookingId + " confirmed!");
-    }
-
-    public void cancel() {
-        if (isConfirmed) {
-            for (Seat seat : seats) {
-                seat.setBooked(false); // Free the seats upon cancellation
-            }
-            System.out.println("❌ Booking #" + bookingId + " canceled.");
-        } else {
-            System.out.println("❗ Booking was never confirmed, no need to cancel.");
-        }
-        isConfirmed = false;
-    }
-
-    public Member getMember() {
-        return member;
+    // Getters for the booking details
+    public Movie getMovie() {
+        return movie;
     }
 
     public Showtime getShowtime() {
@@ -60,5 +29,36 @@ public class Booking {
 
     public boolean isConfirmed() {
         return isConfirmed;
+    }
+
+    // Method to confirm the booking
+    public void confirmBooking() {
+        this.isConfirmed = true;
+        System.out.println("Booking confirmed for " + movie.getTitle() + " at " + showtime.getDate() + " " + showtime.getTime());
+    }
+
+    // Method to cancel the booking
+    public void cancel() {
+        // Unbook all the selected seats
+        for (Seat seat : seats) {
+            seat.unbookSeat();
+        }
+        // Mark the booking as cancelled
+        this.isConfirmed = false;
+        System.out.println("Booking for " + movie.getTitle() + " has been cancelled.");
+    }
+
+    // Method to display the booking details
+    public String getBookingDetails() {
+        StringBuilder details = new StringBuilder();
+        details.append("Movie: ").append(movie.getTitle()).append("\n")
+               .append("Showtime: ").append(showtime.getDate()).append(" ").append(showtime.getTime()).append("\n")
+               .append("Seats: ");
+        for (Seat seat : seats) {
+            details.append(seat.getSeatNumber()).append(" ");
+        }
+        details.append("\n");
+
+        return details.toString();
     }
 }

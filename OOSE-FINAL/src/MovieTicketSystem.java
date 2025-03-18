@@ -197,9 +197,30 @@ public class MovieTicketSystem {
                     }
                     break;
                 case 5:
-                    
-                    new Showtime(String date, String time, double price, Movie movie, int seatCount);
-                    admin.addShowtime(,);
+                    System.out.println("Enter Movie ID:");
+                    Movie movies;
+                    adddd: while (true) {
+                        movieId = getUserChoice();
+                        for (Movie mv : movieList) {
+                            if (movieId == mv.getId()) {
+                                movies = mv;
+                                break adddd;
+                            }
+                        }
+                        System.out.println("Invalid id. please try again.");
+                    }
+                    System.out.print("Enter date (YYYY/MM/DD):");
+                    String date = scanner.nextLine();
+                    System.out.print("Enter Showtime:");
+                    String time = scanner.nextLine();
+                    System.out.print("Enter price:");
+                    double price = scanner.nextDouble();
+                    scanner.nextLine();
+                    System.out.println("Enter seat size");
+                    System.out.print("width:");
+                    int row = getUserChoice();
+                    int column = getUserChoice();
+                    admin.addShowtime(movies, new Showtime(date, time, price, movies, row, column));
                     break;
                 case 6:
                     return; // Go back to Admin Menu
@@ -228,19 +249,22 @@ public class MovieTicketSystem {
             System.out.println("=".repeat(50));
             System.out.println("[1] View Movies & Book Tickets");
             System.out.println("[2] Add Balance");
-            System.out.println("[3] Logout");
-    
+            System.out.println("[3] View Booked Tickets");
+            System.out.println("[4] Logout");
+
             int choice = getUserChoice();
-    
+
             switch (choice) {
                 case 1:
-                    member.selectMovie(movieList);
+                    if(!movieList.isEmpty()) member.viewMoviesAndBookTickets(movieList, scanner);
                     break;
                 case 2:
-                    System.out.println("Enter amount to add");
-                    member.addBalance(getUserChoice());
+                    member.addBalance(scanner);
                     break;
                 case 3:
+                    member.viewBookedTickets(scanner);
+                    break;
+                case 4:
                     System.out.println("Logging out...");
                     return;
                 default:
@@ -248,5 +272,5 @@ public class MovieTicketSystem {
             }
         }
     }
-    
+
 }
