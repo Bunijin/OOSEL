@@ -1,218 +1,108 @@
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Scanner;
 
 public class Member extends Account {
     private double balance;
-    private List<Booking> bookings;
+    private List<Ticket> tickets;
 
-    public Member(String name, String password) {
+    public Member(String name, String password) throws Throwable {
         super(name, password);
         this.balance = 0.0;
-        this.bookings = new ArrayList<>();
+        this.tickets = new ArrayList<>();
     }
 
     public double getBalance() {
         return balance;
     }
 
-    public List<Booking> getBookings() {
-        return bookings;
-    }
-    
-    public void viewMoviesAndBookTickets(List<Movie> movieList,Scanner scanner) {
-        // View available movies
-        System.out.println("Available Movies:");
-        for (int i = 0; i < movieList.size(); i++) {
-            System.out.println("[" + (i + 1) + "] " + movieList.get(i).getTitle());
-        }
-        
-        // Select movie
-        Movie selectedMovie = selectMovie(movieList, scanner);
-        if (selectedMovie == null) return;
-    
-        // Select showtime
-        Showtime selectedShowtime = selectShowtime(selectedMovie, scanner);
-        if (selectedShowtime == null) return;
-    
-        // Select seats
-        List<Seat> selectedSeats = selectSeats(selectedShowtime, scanner);
-        if (selectedSeats.isEmpty()) return;
-    
-        // Confirm booking
-        confirmBooking(selectedMovie, selectedSeats, selectedShowtime, scanner);
-    }
-    
-    private Movie selectMovie(List<Movie> movieList, Scanner scanner) {
-        System.out.print("Enter the number of the movie you want to watch: ");
-        int movieIndex = scanner.nextInt();
-
-        if (movieIndex < 1 || movieIndex > movieList.size()) {
-            System.out.println("[ERROR] Invalid selection.");
-            return null;
-        }
-
-        return movieList.get(movieIndex - 1);
-    }
-
-    private Showtime selectShowtime(Movie movie, Scanner scanner) {
-        List<Showtime> showtimes = movie.getShowtimes();
-
-        if (showtimes.isEmpty()) {
-            System.out.println("[INFO] No showtimes available for this movie.");
-            return null;
-        }
-
-        System.out.println("Available Showtimes:");
-        for (int i = 0; i < showtimes.size(); i++) {
-            System.out.println("[" + (i + 1) + "] " + showtimes.get(i).getDate() + " - " + showtimes.get(i).getTime());
-        }
-
-        System.out.print("Select a showtime: ");
-        int showtimeIndex = scanner.nextInt();
-        scanner.nextLine();  // Consume the newline
-
-        if (showtimeIndex < 1 || showtimeIndex > showtimes.size()) {
-            System.out.println("[ERROR] Invalid selection.");
-            return null;
-        }
-
-        return showtimes.get(showtimeIndex - 1);
-    }
-
-    private List<Seat> selectSeats(Showtime showtime, Scanner scanner) {
-        List<Seat> selectedSeats = new ArrayList<>();
-
-        // Display available seats
-        showtime.displaySeats();
-
-        System.out.print("Enter seat numbers separated by space (e.g., A1 B2 C3): ");
-        String[] seatNumbers = scanner.nextLine().split(" ");
-        Seat[][] seats = showtime.getSeats();
-
-        for (String seatNumber : seatNumbers) {
-            if (seatNumber.length() < 2) {
-                System.out.println("[ERROR] Invalid seat format: " + seatNumber);
-                continue;
-            }
-
-            char rowChar = seatNumber.charAt(0);
-            int row = rowChar - 'A';  // Convert letter to row index
-
-            int col;
-            try {
-                col = Integer.parseInt(seatNumber.substring(1)) - 1;  // Convert number to col index
-            } catch (NumberFormatException e) {
-                System.out.println("[ERROR] Invalid seat number: " + seatNumber);
-                continue;
-            }
-
-            // Check if seat is within range and unbooked
-            if (row >= 0 && row < seats.length && col >= 0 && col < seats[row].length) {
-                Seat seat = seats[row][col];
-                if (!seat.isBooked()) {
-                    seat.bookSeat();
-                    selectedSeats.add(seat);
-                } else {
-                    System.out.println("[ERROR] Seat " + seatNumber + " is already booked.");
-                }
-            } else {
-                System.out.println("[ERROR] Seat " + seatNumber + " is out of range.");
-            }
-        }
-
-        return selectedSeats;
-    }
-
-    // Confirm booking and process payment
-    private void confirmBooking(Movie selectedMovie, List<Seat> selectedSeats, Showtime selectedShowtime, Scanner scanner) {
-        double totalCost = selectedSeats.size() * selectedShowtime.getPrice();
-        System.out.println("Total Cost: " + totalCost + " Baht");
-        System.out.print("Confirm booking? (yes/no): ");
-        String confirm = scanner.nextLine();
-
-        if (!confirm.equalsIgnoreCase("yes")) {
-            cancelBooking(selectedSeats);
-            System.out.println("Booking cancelled. Seats are now available again.");
-            return;
-        }
-
-        if (!processPayment(totalCost)) {
-            cancelBooking(selectedSeats);
-            System.out.println("[ERROR] Payment failed.");
-            return;
-        }
-        // Create a new Booking object
-        Booking newBooking = new Booking(selectedMovie, selectedShowtime, selectedSeats);
-    
-        // Add the booking to the member's bookings list
-        bookings.add(newBooking);
-        System.out.println("Booking Successful! Enjoy your movie.");
-    }
-
-    // Cancel booking and free up the seats
-    private void cancelBooking(List<Seat> selectedSeats) {
-        for (Seat seat : selectedSeats) {
-            seat.unbookSeat();  // Unbook the seat and make it available
-        }
-        selectedSeats.clear();  // Clear the list of selected seats
-    }
-
-    // Process payment (dummy implementation)
-    private boolean processPayment(double amount) {
-        if (balance >= amount) {
-            balance -= amount;
-            System.out.println("Payment successful! Remaining balance: " + balance + " Baht");
-            return true;
-        } else {
-            System.out.println("[ERROR] Insufficient balance.");
-            return false;
-        }
-    }
-
-    // Add balance to member account
-    public void addBalance(Scanner scanner) {
-        System.out.print("Enter amount to add to your balance: ");
-        double amount = scanner.nextDouble();
-        scanner.nextLine();  // Consume the newline
-
+    public void addBalance(double amount) throws IllegalArgumentException {
         if (amount <= 0) {
-            System.out.println("[ERROR] Invalid amount.");
-            return;
+            throw new IllegalArgumentException("Amount must be positive");
+        }
+        this.balance += amount;
+    }
+
+    public void deductBalance(double amount) throws IllegalArgumentException {
+        if (amount <= 0) {
+            throw new IllegalArgumentException("Amount must be positive");
+        }
+        if (balance < amount) {
+            throw new IllegalArgumentException("Insufficient funds");
+        }
+        this.balance -= amount;
+    }
+
+    public List<Ticket> getTickets() {
+        return new ArrayList<>(tickets); // Return a copy to prevent direct modification
+    }
+
+    public void addTicket(Ticket ticket) {
+        tickets.add(ticket);
+    }
+    
+    public void bookTicket(Showtime showtime, int row, int col) 
+            throws IllegalArgumentException {
+        // Check if the seat is available
+        if (row < 0 || row >= showtime.getRows() || col < 0 || col >= showtime.getColumns() 
+                || !showtime.getSeatAvailability()[row][col]) {
+            throw new IllegalArgumentException("Seat is not available");
         }
         
-        this.balance += amount;
-        System.out.println("Balance successfully updated. Current balance: " + balance + " Baht");
+        // Check if user has enough balance
+        double price = showtime.getPrice();
+        if (balance < price) {
+            throw new IllegalArgumentException("Insufficient funds to book this ticket");
+        }
+        
+        // Book the seat
+        showtime.bookSeat(row, col);
+        
+        // Deduct balance
+        deductBalance(price);
+        
+        // Create a ticket and add it to the member's tickets
+        String seatNumber = (char)('A' + row) + "" + (col + 1);
+        Ticket ticket = new Ticket(this, showtime, showtime.getMovie().getTitle(), seatNumber);
+        addTicket(ticket);
+        
+        return;
     }
-
-    // View booked tickets
-    public void viewBookedTickets(Scanner scanner) {
-        if (bookings.isEmpty()) {
-            System.out.println("You have no booked tickets.");
-            return;
+    
+    public void cancelTicket(Ticket ticket) throws IllegalArgumentException {
+        // Check if the ticket belongs to this member
+        if (!tickets.contains(ticket)) {
+            throw new IllegalArgumentException("Ticket not found in your bookings");
         }
-
-        System.out.println("Your Booked Tickets:");
-        for (int i = 0; i < bookings.size(); i++) {
-            System.out.println("[" + (i + 1) + "] " + bookings.get(i).getMovie().getTitle() + " at " + bookings.get(i).getShowtime().getDate() + " " + bookings.get(i).getShowtime().getTime());
-        }
-
-        System.out.print("Select a booking to cancel (0 to exit): ");
-        int bookingIndex = scanner.nextInt();
-        scanner.nextLine();  // Consume the newline
-
-        if (bookingIndex < 1 || bookingIndex > bookings.size()) {
-            System.out.println("[ERROR] Invalid selection.");
-            return;
-        }
-
-        Booking selectedBooking = bookings.get(bookingIndex - 1);
-        cancelBooking(selectedBooking);
+        
+        // Get the seat coordinates from the ticket
+        int row = ticket.getRow();
+        int col = ticket.getColumn();
+        Showtime showtime = ticket.getShowtime();
+        
+        // Make the seat available again in the showtime
+        showtime.unbookSeat(row, col);
+        
+        // Remove the ticket from the member's list
+        tickets.remove(ticket);
+        
+        // Calculate refund amount (you can implement different refund policies here)
+        double refundAmount = showtime.getPrice();
+        
+        // Add the refund to the member's balance
+        this.balance += refundAmount;
     }
-
-    // Cancel a specific booking
-    private void cancelBooking(Booking booking) {
-        booking.cancel();
-        System.out.println("Booking cancelled and seats freed.");
+    
+    public List<Movie> searchMovies(List<Movie> allMovies, String searchTerm) {
+        List<Movie> results = new ArrayList<>();
+        searchTerm = searchTerm.toLowerCase();
+        
+        for (Movie movie : allMovies) {
+            if (movie.getTitle().toLowerCase().contains(searchTerm) || 
+                movie.getGenre().toLowerCase().contains(searchTerm)) {
+                results.add(movie);
+            }
+        }
+        
+        return results;
     }
 }
